@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using ExpectedObjects;
 using Xunit;
 
@@ -24,6 +24,25 @@ namespace CursoOnline.DominioTest.Cursos
             // assert
             cursoEsperado.ToExpectedObject().ShouldMatch(curso);
         }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void NaoDeveCursoTerUmNomeInvalido(string nomeInvalido)
+        {
+            var cursoEsperado = new
+            {
+                Nome = "Informática Básica",
+                CargaHoraria = (double)80,
+                PublicoAlvo = PublicoAlvo.Estudante,
+                Valor = (double)950,
+            };
+
+            // action
+            Assert.Throws<ArgumentException>(() =>
+                new Curso(nomeInvalido, cursoEsperado.CargaHoraria, cursoEsperado.PublicoAlvo, cursoEsperado.Valor));
+        }
+
     }
 
     public enum PublicoAlvo
@@ -38,6 +57,10 @@ namespace CursoOnline.DominioTest.Cursos
     {
         public Curso(string nome, double cargaHoraria, PublicoAlvo publicoAlvo, double valor)
         {
+            if (string.IsNullOrEmpty(nome))
+            {
+                throw new ArgumentException();
+            }
             Nome = nome;
             CargaHoraria = cargaHoraria;
             PublicoAlvo = publicoAlvo;
