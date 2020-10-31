@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "/+CJvTWJgC/EwMEhaKdbAXtGjZD0FV+q0sK0pS6/tTtE5mBP4megn1fl1v6w2yUpO2b36atIfryIa1SACq3r6w==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Pablo\\Desktop\\Cursos\\tdd\\CursoOnline\\src\\CursoOnline.Dominio\\CursoOnline.Dominio.csproj",
+  "expectedPackageFiles": [
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
