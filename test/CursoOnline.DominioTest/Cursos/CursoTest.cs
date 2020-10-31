@@ -1,4 +1,5 @@
 ﻿using System;
+using CursoOnline.DominioTest._Util;
 using ExpectedObjects;
 using Xunit;
 
@@ -39,8 +40,9 @@ namespace CursoOnline.DominioTest.Cursos
             };
 
             // action
-            Assert.Throws<ArgumentException>(() =>
-                new Curso(nomeInvalido, cursoEsperado.CargaHoraria, cursoEsperado.PublicoAlvo, cursoEsperado.Valor));
+             Assert.Throws<ArgumentException>(() =>
+                new Curso(nomeInvalido, cursoEsperado.CargaHoraria, cursoEsperado.PublicoAlvo, cursoEsperado.Valor))
+                .ComMessagem("Nome Inválido");
         }
 
         [Theory]
@@ -59,7 +61,31 @@ namespace CursoOnline.DominioTest.Cursos
 
             // action
             Assert.Throws<ArgumentException>(() =>
-                new Curso(cursoEsperado.Nome, cargaHorariaInvalida, cursoEsperado.PublicoAlvo, cursoEsperado.Valor));
+                new Curso(cursoEsperado.Nome, cargaHorariaInvalida, cursoEsperado.PublicoAlvo, cursoEsperado.Valor))
+                .ComMessagem("Carga horária inválida");
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-2)]
+        [InlineData(-100)]
+        public void NaoDeveCursoTerUmValorMenorQue1(double valorInvalido)
+        {
+            var cursoEsperado = new
+            {
+                Nome = "Informática Básica",
+                CargaHoraria = (double)80,
+                PublicoAlvo = PublicoAlvo.Estudante,
+                Valor = (double)950,
+            };
+
+            // action
+            var message = Assert.Throws<ArgumentException>(() =>
+                new Curso(cursoEsperado.Nome, cursoEsperado.CargaHoraria, cursoEsperado.PublicoAlvo, valorInvalido))
+                .Message;
+
+            Assert.Equal("Valor inválido", message);
+
         }
     }
 
@@ -77,12 +103,17 @@ namespace CursoOnline.DominioTest.Cursos
         {
             if (string.IsNullOrEmpty(nome))
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Nome Inválido");
             }
 
             if (cargaHoraria < 1)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Carga horária inválida");
+            }
+
+            if (valor < 1)
+            {
+                throw new ArgumentException("Valor inválido");
             }
 
             Nome = nome;
