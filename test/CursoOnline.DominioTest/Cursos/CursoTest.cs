@@ -43,6 +43,24 @@ namespace CursoOnline.DominioTest.Cursos
                 new Curso(nomeInvalido, cursoEsperado.CargaHoraria, cursoEsperado.PublicoAlvo, cursoEsperado.Valor));
         }
 
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-2)]
+        [InlineData(-100)]
+        public void NaoDeveCursoTerUmaCargaHorariaMenorQue1(double cargaHorariaInvalida)
+        {
+            var cursoEsperado = new
+            {
+                Nome = "Informática Básica",
+                CargaHoraria = (double)80,
+                PublicoAlvo = PublicoAlvo.Estudante,
+                Valor = (double)950,
+            };
+
+            // action
+            Assert.Throws<ArgumentException>(() =>
+                new Curso(cursoEsperado.Nome, cargaHorariaInvalida, cursoEsperado.PublicoAlvo, cursoEsperado.Valor));
+        }
     }
 
     public enum PublicoAlvo
@@ -61,6 +79,12 @@ namespace CursoOnline.DominioTest.Cursos
             {
                 throw new ArgumentException();
             }
+
+            if (cargaHoraria < 1)
+            {
+                throw new ArgumentException();
+            }
+
             Nome = nome;
             CargaHoraria = cargaHoraria;
             PublicoAlvo = publicoAlvo;
