@@ -1,6 +1,8 @@
-﻿using Bogus;
+﻿using System;
+using Bogus;
 using CursoOnline.Dominio.Cursos;
 using CursoOnline.Dominio.Enumerators;
+using CursoOnline.DominioTest._Util;
 using Moq;
 using Xunit;
 
@@ -20,7 +22,7 @@ namespace CursoOnline.DominioTest.Cursos
                 Nome = fake.Random.Words(),
                 Descricao = fake.Lorem.Paragraph(),
                 CargaHoraria = fake.Random.Double(50, 1000),
-                PublicoAlvo = 1,
+                PublicoAlvo = "Estudante",
                 Valor = fake.Random.Double(50, 1000),
             };
 
@@ -36,6 +38,17 @@ namespace CursoOnline.DominioTest.Cursos
                 r => r.Adicionar(It.Is<Curso>(
                     c => c.Nome == _cursoDto.Nome &&
                          c.Descricao == _cursoDto.Descricao)));
+        }
+
+        [Fact]
+        public void NaoDeveInformarPublicoAlvoInvalido()
+        {
+            var publicoAlvoInvalido = "Médico";
+            _cursoDto.PublicoAlvo = publicoAlvoInvalido;
+            
+            Assert.Throws<ArgumentException>(() => _armazenadorDeCurso.Armazenar(_cursoDto))
+                .ComMessagem("Publico Alvo Inválido");
+
         }
     }
 
@@ -55,8 +68,15 @@ namespace CursoOnline.DominioTest.Cursos
 
         public void Armazenar(CursoDto cursoDto)
         {
-            var curso = new Curso(cursoDto.Nome, cursoDto.Descricao, cursoDto.CargaHoraria, 
-                PublicoAlvo.Estudante, cursoDto.Valor);
+            Enum.TryParse(typeof(PublicoAlvo), cursoDto.PublicoAlvo, out var publicoAlvo);
+
+            if (publicoAlvo == null)
+            {
+                throw new ArgumentException("Publico Alvo Inválido");
+            }
+
+            var curso = new Curso(cursoDto.Nome, cursoDto.Descricao, cursoDto.CargaHoraria,
+                (PublicoAlvo)publicoAlvo, cursoDto.Valor);
 
            _cursoRepository.Adicionar(curso);
         }
@@ -67,7 +87,7 @@ namespace CursoOnline.DominioTest.Cursos
         public string Nome { get; set; }
         public string Descricao { get; set; }
         public double CargaHoraria { get; set; }
-        public int PublicoAlvo { get; set; }
+        public string PublicoAlvo { get; set; }
         public double Valor { get; set; }
     }
 }
