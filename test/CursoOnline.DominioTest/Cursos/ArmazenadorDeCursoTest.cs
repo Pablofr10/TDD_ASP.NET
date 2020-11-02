@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+﻿using Bogus;
 using CursoOnline.Dominio.Cursos;
 using CursoOnline.Dominio.Enumerators;
 using Moq;
@@ -8,24 +8,34 @@ namespace CursoOnline.DominioTest.Cursos
 {
     public class ArmazenadorDeCursoTest
     {
+        private readonly CursoDto _cursoDto;
+        private readonly ArmazenadorDeCurso _armazenadorDeCurso;
+        private readonly Mock<ICursoRepository> _cursoRepositorioMock;
+
+        public ArmazenadorDeCursoTest()
+        {
+            var fake = new Faker();
+            _cursoDto = new CursoDto
+            {
+                Nome = fake.Random.Words(),
+                Descricao = fake.Lorem.Paragraph(),
+                CargaHoraria = fake.Random.Double(50, 1000),
+                PublicoAlvo = 1,
+                Valor = fake.Random.Double(50, 1000),
+            };
+
+             _cursoRepositorioMock = new Mock<ICursoRepository>();
+            _armazenadorDeCurso = new ArmazenadorDeCurso(_cursoRepositorioMock.Object);
+        }
+
         [Fact]
         public void DeveAdicionarCurso()
         {
-            var cursoDto = new CursoDto
-            {
-                Nome = "Curso A",
-                Descricao = "Descrição",
-                CargaHoraria = 80,
-                PublicoAlvo = 1,
-                Valor = 850.00,
-            };
-
-            var cursoRepositorioMock = new Mock<ICursoRepository>();
-
-            var armazenadorDeCurso = new ArmazenadorDeCurso(cursoRepositorioMock.Object);
-
-            armazenadorDeCurso.Armazenar(cursoDto);
-            cursoRepositorioMock.Verify(r => r.Adicionar(It.IsAny<Curso>()));
+            _armazenadorDeCurso.Armazenar(_cursoDto);
+            _cursoRepositorioMock.Verify(
+                r => r.Adicionar(It.Is<Curso>(
+                    c => c.Nome == _cursoDto.Nome &&
+                         c.Descricao == _cursoDto.Descricao)));
         }
     }
 
@@ -56,7 +66,7 @@ namespace CursoOnline.DominioTest.Cursos
     {
         public string Nome { get; set; }
         public string Descricao { get; set; }
-        public int CargaHoraria { get; set; }
+        public double CargaHoraria { get; set; }
         public int PublicoAlvo { get; set; }
         public double Valor { get; set; }
     }
