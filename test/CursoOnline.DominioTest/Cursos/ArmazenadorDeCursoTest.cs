@@ -1,7 +1,7 @@
 ﻿using System;
 using Bogus;
 using CursoOnline.Dominio.Cursos;
-using CursoOnline.Dominio.Enumerators;
+using CursoOnline.DominioTest._Builders;
 using CursoOnline.DominioTest._Util;
 using Moq;
 using Xunit;
@@ -50,44 +50,15 @@ namespace CursoOnline.DominioTest.Cursos
                 .ComMessagem("Publico Alvo Inválido");
 
         }
-    }
 
-    public interface ICursoRepository
-    {
-        void Adicionar(Curso curso);
-    }
-
-    public class ArmazenadorDeCurso
-    {
-        private readonly ICursoRepository _cursoRepository;
-
-        public ArmazenadorDeCurso(ICursoRepository cursoRepository)
+        [Fact]
+        public void NaoDeveAdicionarCursoComMesmoNomeDeOutroJaSalvo()
         {
-            _cursoRepository = cursoRepository;
+            var cursoJaSalvo = CursoBuidler.Novo().ComNome(_cursoDto.Nome).Build();
+            _cursoRepositorioMock.Setup(r => r.ObterPeloNome(_cursoDto.Nome)).Returns(cursoJaSalvo);
+
+            Assert.Throws<ArgumentException>(() => _armazenadorDeCurso.Armazenar(_cursoDto))
+                .ComMessagem("Nome do curso já consta no banco de dados");
         }
-
-        public void Armazenar(CursoDto cursoDto)
-        {
-            Enum.TryParse(typeof(PublicoAlvo), cursoDto.PublicoAlvo, out var publicoAlvo);
-
-            if (publicoAlvo == null)
-            {
-                throw new ArgumentException("Publico Alvo Inválido");
-            }
-
-            var curso = new Curso(cursoDto.Nome, cursoDto.Descricao, cursoDto.CargaHoraria,
-                (PublicoAlvo)publicoAlvo, cursoDto.Valor);
-
-           _cursoRepository.Adicionar(curso);
-        }
-    }
-
-    public class CursoDto
-    {
-        public string Nome { get; set; }
-        public string Descricao { get; set; }
-        public double CargaHoraria { get; set; }
-        public string PublicoAlvo { get; set; }
-        public double Valor { get; set; }
     }
 }
